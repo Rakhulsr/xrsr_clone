@@ -2,9 +2,17 @@ import express from "express";
 import "dotenv/config";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import { v2 } from "cloudinary";
 
-import authRoutes from "../backend/routes/auth.route.js";
+import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import connectMongoDB from "./db/dbConnect.js";
+
+v2.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 app.listen(PORT, (err) => {
   if (err) console.error(err);
