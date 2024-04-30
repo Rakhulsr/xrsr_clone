@@ -9,6 +9,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import LoadingSpinner from "../common/LoadingSpinner";
+import { formatPostDate } from "../../utils/dates/dates";
 
 const Post = ({ post }) => {
   const [comment, setComment] = useState("");
@@ -46,32 +47,69 @@ const Post = ({ post }) => {
           method: "POST",
         });
         const data = await res.json();
-
         if (!res.ok) {
           throw new Error(data.error || "Something went wrong");
         }
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    onSuccess: (updatedLikes) => {
+      // this is not the best UX, bc it will refetch all posts
+      // queryClient.invalidateQueries({ queryKey: ["posts"] });
+
+      // instead, update the cache directly for that post
+      queryClient.setQueryData(["posts"], (oldData) => {
+        return oldData.map((p) => {
+          if (p._id === post._id) {
+            return { ...p, likes: updatedLikes };
+          }
+          return p;
+        });
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const { mutate: commentPost, isPending: isCommenting } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/api/posts/comment/${post._id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: comment }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Something went Wrong");
         return data;
       } catch (error) {
         throw new Error(error.message);
       }
     },
     onSuccess: () => {
+      toast.success("commented");
+      setComment("");
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
-
-    onError: (error) => {
+    onError(error) {
       toast.error(error.message);
     },
   });
 
   const postOwner = post.user;
 
+  const isLiked = post.likes.includes(authUser._id);
+
   const isMyPost = authUser._id === post.user._id;
 
-  const isLiked = post.likes.includes(authUser._id);
-  const formattedDate = "1h";
+  const formattedDate = formatPostDate(post.createdAt);
 
-  const isCommenting = false;
+  //   const isCommenting = false;
 
   const handleDeletePost = () => {
     deletePost();
@@ -79,9 +117,12 @@ const Post = ({ post }) => {
 
   const handlePostComment = (e) => {
     e.preventDefault();
+    if (isCommenting) return;
+    commentPost();
   };
 
-  const handleLikePost = () => {
+  const handleLikePost = (e) => {
+    e.preventDefault();
     if (isLiking) return;
     likePost();
   };
