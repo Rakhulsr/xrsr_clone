@@ -57,16 +57,8 @@ const Post = ({ post }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      //   queryClient.setQueryData({ queryKey: ["posts"] }, (oldData) => {
-      //     return oldData.map((p) => {
-      //       if (p._id === post._id) {
-      //         return { ...p, likes: updatedLikes };
-      //       }
-      //       console.log(p);
-      //       return p;
-      //     });
-      //   });
     },
+
     onError: (error) => {
       toast.error(error.message);
     },
@@ -76,9 +68,9 @@ const Post = ({ post }) => {
 
   const isMyPost = authUser._id === post.user._id;
 
+  const isLiked = post.likes.includes(authUser._id);
   const formattedDate = "1h";
 
-  const isLiked = post.likes.includes(authUser._id);
   const isCommenting = false;
 
   const handleDeletePost = () => {
