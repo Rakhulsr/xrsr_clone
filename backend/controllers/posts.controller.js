@@ -45,7 +45,7 @@ export const deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    if (post.User.toString() !== req.user._id.toString()) {
+    if (post.user.toString() !== req.user._id.toString()) {
       res
         .status(400)
         .json({ message: " dont have permission to delete this post" });
