@@ -45,7 +45,7 @@ export const deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    if (post.user.toString() !== req.user._id.toString()) {
+    if (post.User.toString() !== req.user._id.toString()) {
       res
         .status(400)
         .json({ message: " dont have permission to delete this post" });
@@ -116,7 +116,7 @@ export const likeOnPost = async (req, res) => {
 
       const likesNotif = new Notification({
         from: userId,
-        to: post.user,
+        to: post.User,
         type: "like",
       });
       await likesNotif.save();
@@ -132,7 +132,7 @@ export const getAllPost = async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate({ path: "User", select: "-password" })
+      .populate({ path: "user", select: "-password" })
       .populate({
         path: "comments.user",
         select: "-password",
@@ -157,7 +157,7 @@ export const getPostLiked = async (req, res) => {
     const likedPosts = await Post.find({
       _id: { $in: user.likedPosts },
     })
-      .populate({ path: "user", select: "-password" })
+      .populate({ path: "User", select: "-password" })
       .populate({ path: "comments.user", select: "-password" });
     res.status(200).json(likedPosts);
   } catch (error) {
