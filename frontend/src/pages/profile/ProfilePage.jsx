@@ -7,8 +7,6 @@ import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkele
 import EditProfileModal from "./EditProfileModal";
 import { formatMemberSinceDate } from "../../utils/dates/dates.js";
 
-// import { POSTS } from "../../utils/db/dummy";
-
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
@@ -35,11 +33,13 @@ const ProfilePage = () => {
     refetch,
     isRefetching,
   } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["Authuser"],
     queryFn: async () => {
       try {
         const res = await fetch(`/api/users/profile/${username}`);
+
         const data = await res.json();
+
         if (!res.ok) throw new Error(data.error);
 
         return data;
@@ -50,17 +50,6 @@ const ProfilePage = () => {
   });
 
   const memberSinceDate = formatMemberSinceDate(user?.createdAt);
-  //   const authUser = {
-  //     _id: "1",
-  //     fullName: "John Doe",
-  //     username: "johndoe",
-  //     profileImg: "/avatars/boy2.png",
-  //     coverImg: "/cover.png",
-  //     bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  //     link: "https://youtube.com/@asaprogrammer_",
-  //     following: ["1", "2", "3"],
-  //     followers: ["1", "2", "3"],
-  //   };
 
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];

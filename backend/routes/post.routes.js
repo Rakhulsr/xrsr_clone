@@ -14,11 +14,13 @@ import {
 
 const router = express.Router();
 
+// userProfile
 router.get("/all", protectedMe, getAllPost);
 router.get("/following", protectedMe, getFollowingPost);
 router.get("/likes/:id", protectedMe, getPostLiked);
 router.get("/user/:username", protectedMe, getUserPosts);
 
+// homepage
 router.post("/create", protectedMe, createPost);
 router.post("/like/:id", protectedMe, likeOnPost);
 router.post("/comment/:id", protectedMe, commentOnPost);

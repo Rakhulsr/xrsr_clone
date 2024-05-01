@@ -162,7 +162,7 @@ export const getPostLiked = async (req, res) => {
     const likedPosts = await Post.find({
       _id: { $in: user.likedPosts },
     })
-      .populate({ path: "User", select: "-password" })
+      .populate({ path: "user", select: "-password" })
       .populate({ path: "comments.user", select: "-password" });
     res.status(200).json(likedPosts);
   } catch (error) {
